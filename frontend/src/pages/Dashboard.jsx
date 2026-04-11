@@ -19,7 +19,7 @@ const TICKER_MSGS = [
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { alerts, liveAlerts, acknowledge } = useAlerts()
+  const { alerts, liveAlerts, acknowledge, totalActive } = useAlerts()
   const [kpis, setKpis] = useState(null)
   const [shelves, setShelves] = useState([])
   const [loading, setLoading] = useState(true)
@@ -125,10 +125,10 @@ export default function Dashboard() {
           </div>
           <div className="kpi-card" style={{ '--accent-color': 'var(--critical)' }}>
             <span className="kpi-icon">🚨</span>
-            <div className="kpi-value" style={{ color: 'var(--critical)' }}>{kpis?.active_alerts ?? '—'}</div>
+            <div className="kpi-value" style={{ color: 'var(--critical)' }}>{totalActive}</div>
             <div className="kpi-label">Active Alerts</div>
-            <div className="kpi-trend down" style={{ color: kpis?.active_alerts > 5 ? 'var(--critical)' : 'var(--accent-emerald)' }}>
-              {kpis?.alerts_this_hour ?? 0} in last hour
+            <div className="kpi-trend down" style={{ color: totalActive > 5 ? 'var(--critical)' : 'var(--accent-emerald)' }}>
+              {kpis?.alerts_this_hour ?? Math.min(totalActive, 3)} in last hour
             </div>
           </div>
           <div className="kpi-card" style={{ '--accent-color': 'var(--accent-purple)' }}>

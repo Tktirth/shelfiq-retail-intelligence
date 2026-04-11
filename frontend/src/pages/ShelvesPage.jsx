@@ -16,8 +16,9 @@ function ShelfDetailModal({ shelf, onClose }) {
     <div
       style={{
         position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-        z: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 200, backdropFilter: 'blur(4px)'
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 9999, backdropFilter: 'blur(4px)',
+        overflowY: 'auto', padding: '20px 0'
       }}
       onClick={onClose}
     >
@@ -26,7 +27,8 @@ function ShelfDetailModal({ shelf, onClose }) {
         style={{
           background: 'var(--bg-card)', border: '1px solid var(--border)',
           borderRadius: 20, padding: 28, width: 700, maxHeight: '85vh',
-          overflowY: 'auto', position: 'relative'
+          overflowY: 'auto', position: 'relative',
+          overscrollBehavior: 'contain', margin: 'auto'
         }}
         className="animate-scale-in"
       >

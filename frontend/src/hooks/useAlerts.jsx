@@ -151,10 +151,11 @@ export function AlertProvider({ children }) {
       return
     }
 
-    // Seed with initial realistic alerts immediately
+    // Seed with initial realistic alerts immediately (small batch)
     const seed = generateInitialAlerts(6)
     setAlerts(seed)
-    setTotalActive(seed.filter(a => a.status === 'active').length)
+    const activeCount = seed.filter(a => a.status === 'active').length
+    setTotalActive(activeCount)
     setConnected(true)
 
     // Try to load from real backend (best-effort)
@@ -184,14 +185,18 @@ export function AlertProvider({ children }) {
       }
     )
 
-    // Client-side live alert generator (always runs)
-    // Generates a new alert every 4-9 seconds
+    // Client-side live alert generator (realistic pace)
+    // Generates a new alert every 25-55 seconds — feels real, not spammy
     const interval = setInterval(() => {
       const newAlert = generateAlert()
       setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20))
-      setAlerts(prev => [newAlert, ...prev].slice(0, 100))
-      setTotalActive(n => n + 1)
-    }, Math.floor(Math.random() * 5000) + 4000)
+      setAlerts(prev => {
+        const updated = [newAlert, ...prev].slice(0, 50)
+        // Sync totalActive with actual active alerts in array
+        setTotalActive(updated.filter(a => a.status === 'active').length)
+        return updated
+      })
+    }, Math.floor(Math.random() * 30000) + 25000)
 
     return () => {
       ws.disconnect()
@@ -199,17 +204,10 @@ export function AlertProvider({ children }) {
     }
   }, [user])
 
-  // Keep the interval randomized by restarting it periodically
+  // Keep totalActive in sync whenever alerts array changes
   useEffect(() => {
-    if (!user) return
-    const jitter = setInterval(() => {
-      const newAlert = generateAlert()
-      setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20))
-      setAlerts(prev => [newAlert, ...prev].slice(0, 100))
-      setTotalActive(n => n + 1)
-    }, 7000)
-    return () => clearInterval(jitter)
-  }, [user])
+    setTotalActive(alerts.filter(a => a.status === 'active').length)
+  }, [alerts])
 
   const acknowledge = useCallback(async (alertId) => {
     // Try backend (best-effort)
