@@ -145,6 +145,9 @@ export function AlertProvider({ children }) {
   const [totalActive, setTotalActive] = useState(0)
   const backendAlive = useRef(false)
 
+  const generatorTimerRef = useRef(null)
+  const isGeneratingRef = useRef(false)
+
   useEffect(() => {
     if (!user) {
       setConnected(false)
@@ -185,26 +188,37 @@ export function AlertProvider({ children }) {
       }
     )
 
-    // Client-side live alert generator (realistic pace)
-    // Generates a new alert every 1.5 to 4 minutes
-    const scheduleNextAlert = () => {
-      const delay = Math.floor(Math.random() * (240000 - 90000)) + 90000;
-      return setTimeout(() => {
-        // Only generate client-side alert if backend seems quiet
-        if (!backendAlive.current) {
-          const newAlert = generateAlert();
-          setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20));
-          setAlerts(prev => [newAlert, ...prev].slice(0, 50));
-        }
-        scheduleNextAlert();
-      }, delay);
-    }
+    // Bulletproof Client-side live alert generator
+    // Singleton check: only start ONE loop per provider life
+    if (!isGeneratingRef.current) {
+      isGeneratingRef.current = true;
+      console.log('[ShelfIQ] Starting realistic alert engine (1.5-4m intervals)');
 
-    const alertTimeout = scheduleNextAlert();
+      const scheduleNextAlert = () => {
+        const delay = Math.floor(Math.random() * (240000 - 90000)) + 90000;
+        
+        generatorTimerRef.current = setTimeout(() => {
+          // Only generate if backend is quiet
+          if (!backendAlive.current) {
+            const newAlert = generateAlert();
+            console.log(`[ShelfIQ] Generating client-side alert: ${newAlert.title}`);
+            setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20));
+            setAlerts(prev => [newAlert, ...prev].slice(0, 50));
+          }
+          scheduleNextAlert();
+        }, delay);
+      }
+
+      scheduleNextAlert();
+    }
 
     return () => {
       ws.disconnect()
-      clearTimeout(alertTimeout)
+      // Note: We don't reset isGeneratingRef here because we want the loop to persist
+      // throughout the Provider session, but we clear the timer if we unmount completely.
+      if (generatorTimerRef.current) {
+        clearTimeout(generatorTimerRef.current);
+      }
     }
   }, [user])
 
