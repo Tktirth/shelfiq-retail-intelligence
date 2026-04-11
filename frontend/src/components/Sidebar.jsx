@@ -80,8 +80,8 @@ export default function Sidebar() {
                style={{ background: connected ? 'var(--accent-emerald)' : 'var(--accent-amber)' }} />
           <span>{connected ? 'Live Feed Connected' : 'Connecting...'}</span>
         </div>
-        <div style={{ marginTop: 8, fontSize: 10, color: 'var(--text-muted)', textAlign: 'center' }}>
-          Demo Mode · YOLOv8 + Prophet
+        <div style={{ marginTop: 8, fontSize: 9, color: 'var(--text-muted)', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 500 }}>
+          Neural Hub • Active Intelligence v4.2
         </div>
       </div>
     </aside>
