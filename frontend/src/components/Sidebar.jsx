@@ -16,37 +16,36 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        {/* Custom SVG logo mark */}
+        {/* High-end Premium SVG logo mark: Neural Prism */}
         <div className="sidebar-logo-icon" style={{ background: 'none', padding: 0, overflow: 'visible', boxShadow: 'none' }}>
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <linearGradient id="prismGrad" x1="0" y1="0" x2="42" y2="42" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="100%" stopColor="#8b5cf6" />
+                <stop offset="50%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#f43f5e" />
               </linearGradient>
-              <linearGradient id="shelfGrad" x1="0" y1="0" x2="40" y2="0" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#22d3ee" />
-                <stop offset="100%" stopColor="#3b82f6" />
-              </linearGradient>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+              </filter>
             </defs>
-            {/* Background rounded square */}
-            <rect width="40" height="40" rx="10" fill="url(#logoGrad)" />
-            {/* Shelf bars */}
-            <rect x="7" y="28" width="26" height="3" rx="1.5" fill="white" opacity="0.9" />
-            <rect x="7" y="20" width="26" height="3" rx="1.5" fill="white" opacity="0.65" />
-            <rect x="7" y="12" width="26" height="3" rx="1.5" fill="white" opacity="0.4" />
-            {/* CV scan circle */}
-            <circle cx="20" cy="20" r="7" stroke="url(#shelfGrad)" strokeWidth="2" fill="none" opacity="0.9" />
-            {/* Center dot */}
-            <circle cx="20" cy="20" r="2.5" fill="white" opacity="0.95" />
-            {/* Corner scan brackets */}
-            <path d="M10 16 L10 10 L16 10" stroke="#22d3ee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.8" />
-            <path d="M30 16 L30 10 L24 10" stroke="#22d3ee" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.8" />
+            {/* Outer Hexagon frame */}
+            <path d="M21 4 L36 12.5 V29.5 L21 38 L6 29.5 V12.5 L21 4Z" stroke="url(#prismGrad)" strokeWidth="2.5" fill="none" style={{ filter: 'url(#glow)' }} />
+            {/* Shelf Lines / Prism facets */}
+            <path d="M10 15 H32" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+            <path d="M8 21 H34" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
+            <path d="M10 27 H32" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+            {/* Central Intelligence Core */}
+            <circle cx="21" cy="21" r="5" fill="url(#prismGrad)" />
+            <circle cx="21" cy="21" r="2" fill="white" />
+            {/* Scanning Beams */}
+            <path d="M21 16 V10 M21 26 V32" stroke="url(#prismGrad)" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
           </svg>
         </div>
         <div className="sidebar-logo-text">
-          <h2 style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.5px', background: 'linear-gradient(135deg, #f1f5f9, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>ShelfIQ</h2>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.2px' }}>See every shelf. Miss nothing.</span>
+          <h2 style={{ fontSize: 16, fontWeight: 900, letterSpacing: '-0.8px', background: 'linear-gradient(135deg, #ffffff, #94a3b8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>ShelfIQ</h2>
+          <span style={{ fontSize: 9, color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.4px', textTransform: 'uppercase', opacity: 0.8 }}>Infinite Vision • Zero Blindspots</span>
         </div>
       </div>
 
