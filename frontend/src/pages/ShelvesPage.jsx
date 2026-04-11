@@ -159,10 +159,18 @@ export default function ShelvesPage() {
   const [analysisResult, setAnalysisResult] = useState(null)
 
   useEffect(() => {
-    api.getShelves()
-      .then(setShelves)
-      .catch(console.error)
-      .finally(() => setLoading(false))
+    let intervalId;
+    const fetchShelves = () => {
+      api.getShelves()
+        .then(setShelves)
+        .catch(console.error)
+        .finally(() => setLoading(false))
+    };
+    
+    fetchShelves(); // initial load
+    intervalId = setInterval(fetchShelves, 5000); // 5s live polling
+    
+    return () => clearInterval(intervalId); // cleanup
   }, [])
 
   const openShelf = async (shelf) => {

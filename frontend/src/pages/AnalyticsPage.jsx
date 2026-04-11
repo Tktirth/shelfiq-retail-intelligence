@@ -28,16 +28,24 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      api.getHeatmap(),
-      api.getComplianceTrend(),
-      api.getCompliance()
-    ]).then(([hm, trend, comp]) => {
-      setHeatmap(hm.heatmap || [])
-      setComplianceTrend(trend.trend || [])
-      setCompliance(comp)
-    }).catch(console.error)
-    .finally(() => setLoading(false))
+    let intervalId;
+    const fetchData = () => {
+      Promise.all([
+        api.getHeatmap(),
+        api.getComplianceTrend(),
+        api.getCompliance()
+      ]).then(([hm, trend, comp]) => {
+        setHeatmap(hm.heatmap || [])
+        setComplianceTrend(trend.trend || [])
+        setCompliance(comp)
+      }).catch(console.error)
+      .finally(() => setLoading(false))
+    };
+
+    fetchData(); // Initial load
+    intervalId = setInterval(fetchData, 5000); // Live polling every 5s
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, [])
 
   // Process heatmap for display

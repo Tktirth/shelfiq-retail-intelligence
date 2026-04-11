@@ -25,13 +25,21 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([api.getKPIs(), api.getShelves()])
-      .then(([kpiData, shelvesData]) => {
-        setKpis(kpiData)
-        setShelves(shelvesData)
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false))
+    let intervalId;
+    const fetchData = () => {
+      Promise.all([api.getKPIs(), api.getShelves()])
+        .then(([kpiData, shelvesData]) => {
+          setKpis(kpiData)
+          setShelves(shelvesData)
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false))
+    };
+    
+    fetchData(); // Initial load
+    intervalId = setInterval(fetchData, 5000); // Live realistic polling every 5s
+    
+    return () => clearInterval(intervalId); // Cleanup
   }, [])
 
   const recentAlerts = [...liveAlerts, ...alerts].slice(0, 5)
