@@ -56,8 +56,57 @@ async def lifespan(app: FastAPI):
     pipeline = get_alert_pipeline()
     await pipeline.initialize()
     logger.info("✅ Smart Retail Shelf Intelligence API started")
+    
+    # Background live feed generator
+    async def generate_live_alerts():
+        import random
+        from alerting.alert_pipeline import get_alert_pipeline
+        while True:
+            await asyncio.sleep(random.randint(3, 8))
+            try:
+                alert_types = ["stockout", "low_stock", "planogram_violation"]
+                alert_type = random.choice(alert_types)
+                templates = {
+                    "stockout": {
+                        "type": "stockout",
+                        "priority": "critical",
+                        "title": f"STOCKOUT: Pringles Original — Aisle C",
+                        "message": "Shelf is empty. Revenue impact: ₹320/hr",
+                        "suggested_action": "High-priority restock needed",
+                        "revenue_impact": 320.0,
+                        "status": "active"
+                    },
+                    "low_stock": {
+                        "type": "low_stock",
+                        "priority": "high",
+                        "title": "LOW STOCK: Dairy Section",
+                        "message": "Fast moving item below threshold.",
+                        "suggested_action": "Restock next run",
+                        "revenue_impact": 150.0,
+                        "status": "active"
+                    },
+                    "planogram_violation": {
+                        "type": "planogram_violation",
+                        "priority": "medium",
+                        "title": "Planogram Violation — Aisle A",
+                        "message": "Unauthorized product detected.",
+                        "suggested_action": "Remove item",
+                        "revenue_impact": 40.0,
+                        "status": "active"
+                    }
+                }
+                alert_data = dict(templates[alert_type])
+                alert_data["shelf"] = "Live Monitoring Camera"
+                pipeline_inst = get_alert_pipeline()
+                await pipeline_inst.publish_alert(alert_data)
+            except Exception as e:
+                pass
+                
+    bg_task = asyncio.create_task(generate_live_alerts())
+    
     yield
     # Shutdown
+    bg_task.cancel()
     logger.info("Shutting down...")
 
 
