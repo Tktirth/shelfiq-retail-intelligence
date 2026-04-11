@@ -186,21 +186,25 @@ export function AlertProvider({ children }) {
     )
 
     // Client-side live alert generator (realistic pace)
-    // Generates a new alert every 25-55 seconds — feels real, not spammy
-    const interval = setInterval(() => {
-      const newAlert = generateAlert()
-      setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20))
-      setAlerts(prev => {
-        const updated = [newAlert, ...prev].slice(0, 50)
-        // Sync totalActive with actual active alerts in array
-        setTotalActive(updated.filter(a => a.status === 'active').length)
-        return updated
-      })
-    }, Math.floor(Math.random() * 30000) + 25000)
+    // Generates a new alert every 1.5 to 4 minutes
+    const scheduleNextAlert = () => {
+      const delay = Math.floor(Math.random() * (240000 - 90000)) + 90000;
+      return setTimeout(() => {
+        // Only generate client-side alert if backend seems quiet
+        if (!backendAlive.current) {
+          const newAlert = generateAlert();
+          setLiveAlerts(prev => [newAlert, ...prev].slice(0, 20));
+          setAlerts(prev => [newAlert, ...prev].slice(0, 50));
+        }
+        scheduleNextAlert();
+      }, delay);
+    }
+
+    const alertTimeout = scheduleNextAlert();
 
     return () => {
       ws.disconnect()
-      clearInterval(interval)
+      clearTimeout(alertTimeout)
     }
   }, [user])
 

@@ -62,7 +62,8 @@ async def lifespan(app: FastAPI):
         import random
         from alerting.alert_pipeline import get_alert_pipeline
         while True:
-            await asyncio.sleep(random.randint(3, 8))
+            # Much slower, realistic frequency: 2-5 minutes between alerts
+            await asyncio.sleep(random.randint(120, 300))
             try:
                 alert_types = ["stockout", "low_stock", "planogram_violation"]
                 alert_type = random.choice(alert_types)
