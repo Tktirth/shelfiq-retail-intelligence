@@ -2,11 +2,11 @@ import { useLocation, Link } from 'react-router-dom'
 import { useAlerts } from '../hooks/useAlerts'
 
 const NAV_ITEMS = [
-  { path: '/dashboard', icon: '⬡', label: 'Dashboard' },
-  { path: '/shelves', icon: '🗄️', label: 'Shelf Monitor' },
-  { path: '/alerts', icon: '🚨', label: 'Alerts', badge: true },
-  { path: '/forecast', icon: '📈', label: 'Demand Forecast' },
-  { path: '/analytics', icon: '📊', label: 'Analytics' },
+  { path: '/dashboard', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>, label: 'Dashboard' },
+  { path: '/shelves', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect px="0" py="0" width="20" height="8" x="2" y="3" rx="2"/><rect px="0" py="0" width="20" height="8" x="2" y="13" rx="2"/><path d="M6 7h.01"/><path d="M6 17h.01"/></svg>, label: 'Shelf Monitor' },
+  { path: '/alerts', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>, label: 'Alerts', badge: true },
+  { path: '/forecast', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>, label: 'Demand Forecast' },
+  { path: '/analytics', icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>, label: 'Analytics' },
 ]
 
 export default function Sidebar() {
