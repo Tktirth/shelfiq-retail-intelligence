@@ -67,12 +67,22 @@ export default function Dashboard() {
           setShelves(shelvesData)
         })
         .catch(() => {
-          // Backend unreachable — use client-side generated data
-          setKpis(prev => prev ? { ...prev,
-            active_alerts: Math.floor(2 + Math.random() * 6),
-            alerts_this_hour: Math.floor(Math.random() * 4),
-            revenue_recovered_today: Math.round(14000 + Math.random() * 12000),
-          } : generateFallbackKPIs())
+          // Backend unreachable — use client-side generated data with incremental revenue
+          setKpis(prev => {
+            if (!prev) return generateFallbackKPIs();
+            
+            // Add a small incremental amount to emphasize "live" growth
+            const revenueIncrement = Math.floor(Math.random() * 150) + 50; 
+            const newStockouts = Math.random() > 0.8 ? 1 : 0;
+            
+            return { 
+              ...prev,
+              revenue_recovered_today: prev.revenue_recovered_today + revenueIncrement,
+              stockouts_prevented: prev.stockouts_prevented + newStockouts,
+              active_alerts: totalActive, // Sync with actual hook state
+              alerts_this_hour: Math.max(prev.alerts_this_hour, Math.floor(Math.random() * 4))
+            };
+          });
           setShelves(prev => prev.length ? prev : generateFallbackShelves())
         })
         .finally(() => setLoading(false))
