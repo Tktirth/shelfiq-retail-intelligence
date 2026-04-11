@@ -49,7 +49,7 @@ class ShelfDetector:
 
     def _load_model(self):
         """Loads and enforces real YOLO model for SKU-110K"""
-        model_path = os.getenv("SKU_MODEL_PATH", "backend/yolov8m_sku_full.pt")
+        model_path = os.getenv("SKU_MODEL_PATH", "backend/best.pt")
         
         # Hard halt if the model cannot be found
         if not os.path.exists(model_path):
