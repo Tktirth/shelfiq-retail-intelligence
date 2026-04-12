@@ -128,7 +128,7 @@ retail-shelf-intelligence/
 
 ## 🎓 Contribution & Development
 Developed for the **Retail Intelligence Hackathon**.
-- **Architect:** TIRTH KOSAMBIA
+- **Architect:** TIRTH KOSAMBIA, KUSH PATEL, ALIESH PATEL
 - **Engine:** Neural Hub v4.2 Core
 - **Status:** **Production Ready** 🚀
 
