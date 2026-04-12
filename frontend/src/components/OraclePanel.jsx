@@ -26,23 +26,24 @@ export default function OraclePanel({ isOpen, onClose, kpis, alerts }) {
       setIsTyping(true)
       setStrategy('')
       const fullText = generateInsight()
-      let index = 0
+      let currentIndex = 0
       
       const timer = setInterval(() => {
-        setStrategy(prev => prev + fullText[index])
-        index++
-        if (index >= fullText.length - 1) {
+        if (currentIndex < fullText.length) {
+          setStrategy((prev) => prev + fullText.charAt(currentIndex))
+          currentIndex++
+        } else {
           clearInterval(timer)
           setIsTyping(false)
         }
-      }, 15) // Fast typing effect
+      }, 15)
       
       return () => clearInterval(timer)
     }
   }, [isOpen, kpis])
 
   return (
-    <div className={`oracle-drawer ${isOpen ? 'open' : ''}`}>
+    <div className={`oracle-drawer ${isOpen ? 'open' : ''}`} style={{ zIndex: 9999 }}>
       <div style={{ padding: 24, paddingBottom: 16, borderBottom: '1px solid var(--border)', background: 'linear-gradient(135deg, rgba(59,130,246,0.1), transparent)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>

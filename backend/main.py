@@ -120,7 +120,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://shelfiq-retail-intelligence.vercel.app",
+        "http://localhost:5173",
+        "https://shelfiq-retail-intelligence-git-main-tktirth2006-1170s-projects.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
