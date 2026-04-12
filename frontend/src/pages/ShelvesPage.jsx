@@ -71,31 +71,40 @@ function ShelfDetailModal({ shelf, onClose }) {
               position: 'absolute', bottom: 0, left: 0, right: 0, height: 4,
               background: 'rgba(255,255,255,0.15)', borderRadius: 2
             }} />
-            {(shelf.detected_products || []).map((prod, i) => (
-              <div key={i} style={{
-                position: 'absolute',
-                left: `${(prod.position_x || 0) * 100}%`,
-                bottom: 8,
-                width: 50, height: 70,
-                background: STOCK_COLORS[prod.stock_level] + '22',
-                border: `2px solid ${STOCK_COLORS[prod.stock_level] || 'var(--border)'}`,
-                borderRadius: 6,
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', fontSize: 8, textAlign: 'center',
-                padding: 2, transition: 'all 0.2s'
-              }}>
-                <div style={{ fontSize: 16 }}>
-                  {prod.stock_level === 'full' ? '📦' : prod.stock_level === 'low' ? '⚠️' : '🚨'}
+            {(shelf.detected_products || []).map((prod, i) => {
+              const profitAtRisk = prod.stock_level === 'empty' ? (prod.price || 45) * 5 : prod.stock_level === 'low' ? (prod.price || 45) * 2 : 0;
+              return (
+                <div key={i} style={{
+                  position: 'absolute',
+                  left: `${(prod.position_x || 0) * 100}%`,
+                  bottom: 8,
+                  width: 50, height: 70,
+                  background: STOCK_COLORS[prod.stock_level] + '22',
+                  border: `2px solid ${STOCK_COLORS[prod.stock_level] || 'var(--border)'}`,
+                  borderRadius: 6,
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', fontSize: 8, textAlign: 'center',
+                  padding: 2, transition: 'all 0.2s',
+                  boxShadow: profitAtRisk > 0 ? `0 0 15px ${STOCK_COLORS[prod.stock_level]}` : 'none'
+                }} className="nav-item">
+                  <div style={{ fontSize: 16 }}>
+                    {prod.stock_level === 'full' ? '📦' : prod.stock_level === 'low' ? '⚠️' : '🚨'}
+                  </div>
+                  <div style={{ color: 'white', fontWeight: 600, fontSize: 7, lineHeight: 1.1, marginTop: 2 }}>
+                    {prod.name?.split(' ').slice(0, 2).join('\n') || 'Product'}
+                  </div>
+                  {profitAtRisk > 0 && (
+                    <div style={{ position: 'absolute', top: -18, background: 'var(--critical)', color: 'white', padding: '1px 4px', borderRadius: 4, fontStyle: 'normal', fontWeight: 800, fontSize: 7 }}>
+                      -₹{profitAtRisk}
+                    </div>
+                  )}
+                  <div style={{ color: STOCK_COLORS[prod.stock_level], fontWeight: 700, marginTop: 2 }}>
+                    {Math.round((prod.confidence || 0) * 100)}%
+                  </div>
                 </div>
-                <div style={{ color: 'white', lineHeight: 1.2, marginTop: 2 }}>
-                  {prod.name?.split(' ').slice(0, 2).join('\n')}
-                </div>
-                <div style={{ color: STOCK_COLORS[prod.stock_level], fontWeight: 700, marginTop: 2 }}>
-                  {Math.round(prod.confidence * 100)}%
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 
@@ -256,35 +265,64 @@ export default function ShelvesPage() {
       <div className="page-container">
         {/* Upload Analysis Result */}
         {analysisResult && (
-          <div className="card" style={{ marginBottom: 24, padding: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div className="section-title">🔍 CV Analysis Result — {analysisResult.shelf_name}</div>
-              <button onClick={() => setAnalysisResult(null)}
-                      style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 18 }}>✕</button>
-            </div>
-            <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', gap: 24 }}>
-                <MetricGauge value={analysisResult.health_score} size={90} label="HEALTH" />
-                <MetricGauge value={analysisResult.compliance_score} size={90} label="COMPLIANCE" />
+          <div className="card" style={{ marginBottom: 24, padding: 24, border: '1px solid var(--accent-blue)', background: 'linear-gradient(180deg, var(--bg-card), rgba(59, 130, 246, 0.05))' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div className="section-title" style={{ color: 'var(--accent-blue-light)' }}>
+                🧬 Intelligent Shelf Analysis Complete — {analysisResult.shelf_name}
               </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>Detected Products: {analysisResult.detected_products_count}</div>
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                  {Object.entries(analysisResult.stock_summary || {}).map(([level, count]) => (
-                    <div key={level} style={{
-                      background: `${STOCK_LABEL_COLOR[level]}22`,
-                      border: `1px solid ${STOCK_LABEL_COLOR[level]}`,
-                      borderRadius: 8, padding: '6px 14px', fontSize: 12
-                    }}>
-                      <span style={{ color: STOCK_LABEL_COLOR[level], fontWeight: 700 }}>{count}</span>
-                      <span style={{ color: 'var(--text-secondary)', marginLeft: 6 }}>{level}</span>
+              <button onClick={() => setAnalysisResult(null)}
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-muted)', cursor: 'pointer', padding: '4px 8px' }}>✕</button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'min-content 1fr', gap: 32 }}>
+              <div style={{ display: 'flex', gap: 20 }}>
+                <MetricGauge value={analysisResult.health_score} size={100} label="HEALTH" />
+                <MetricGauge value={analysisResult.compliance_score || 85} size={100} label="COMPLY" color="var(--accent-purple)" />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 12 }}>📋 Detected Inventory Summary</div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                  <div className="results-table-container" style={{ maxHeight: 250, overflowY: 'auto' }}>
+                    <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left', color: 'var(--text-muted)' }}>
+                          <th style={{ padding: '8px 4px' }}>Product</th>
+                          <th style={{ padding: '8px 4px' }}>Qty</th>
+                          <th style={{ padding: '8px 4px' }}>Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.values(
+                          (analysisResult.detected_products || []).reduce((acc, p) => {
+                            if (!acc[p.sku]) acc[p.sku] = { ...p, count: 0 };
+                            acc[p.sku].count += 1;
+                            return acc;
+                          }, {})
+                        ).map((p, i) => (
+                          <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                            <td style={{ padding: '10px 4px', fontWeight: 600 }}>{p.name}</td>
+                            <td style={{ padding: '10px 4px' }}>
+                              <span className="badge badge-low" style={{ padding: '2px 8px', fontSize: 10 }}>{p.count} units</span>
+                            </td>
+                            <td style={{ padding: '10px 4px', color: 'var(--accent-emerald)' }}>₹{p.price}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div style={{ textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: 12, padding: 12, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    {uploadFile && (
+                      <img src={URL.createObjectURL(uploadFile)} alt="Analysis Preview"
+                           style={{ maxWidth: '100%', maxHeight: 150, borderRadius: 8, border: '2px solid var(--border)' }} />
+                    )}
+                    <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }}>
+                      Processed in {Math.round(analysisResult.processing_time_ms)}ms
                     </div>
-                  ))}
+                  </div>
                 </div>
-                {uploadFile && (
-                  <img src={URL.createObjectURL(uploadFile)} alt="Uploaded shelf"
-                       style={{ marginTop: 12, maxHeight: 120, borderRadius: 8, opacity: 0.8 }} />
-                )}
               </div>
             </div>
           </div>

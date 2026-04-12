@@ -63,11 +63,10 @@ class ShelfDetector:
         shelf_id: int,
         image_path: Optional[str] = None,
         image_bytes: Optional[bytes] = None,
-        planogram: Optional[Dict] = None
+        planogram_items: Optional[List[Dict]] = None
     ) -> ShelfAnalysisResult:
         """
-        Analyze a shelf image and return true detection results.
-        Raises an error if image data is completely missing.
+        Analyze a shelf image and identify products using planogram matching.
         """
         start_time = time.time()
         
@@ -83,44 +82,53 @@ class ShelfDetector:
         if img is None:
             raise ValueError("Failed to decode image.")
 
-        # Our yolov8m_sku_full model operates optimally with SKU-110K style defaults 
-        conf_thresh = 0.25
-        iou_thresh = 0.45
-        
-        results = self.model(img, conf=conf_thresh, iou=iou_thresh)
+        # Real YOLO inference
+        results = self.model(img, conf=0.25, iou=0.45)
         detected = []
         stock_counts = {"full": 0, "low": 0, "empty": 0}
 
         for r in results:
-            boxes = r.boxes
-            for box in boxes:
+            for box in r.boxes:
                 x1, y1, x2, y2 = box.xyxyn[0].tolist()
                 conf = float(box.conf[0])
-                cls_id = int(box.cls[0])
-                cls_name = self.model.names[cls_id] # Should typically map to 'object'
+                
+                # Center point of detection for spatial matching
+                cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+                
+                # Default values if no planogram match
+                sku_val = "SKU-UNKNOWN"
+                name_val = "Detected Product"
+                price_val = 0.0
+                
+                # Spatial matching to planogram
+                if planogram_items:
+                    best_dist = float('inf')
+                    for item in planogram_items:
+                        # Euclidean distance between detection center and planogram slot
+                        dist = ((cx - item['x'])**2 + (cy - item['y'])**2)**0.5
+                        if dist < 0.15 and dist < best_dist: # 15% radius threshold
+                            best_dist = dist
+                            sku_val = item['sku']
+                            name_val = item['name']
+                            price_val = item.get('price', 0.0)
 
-                # Estimate stock level from bbox area (proxy for facings)
+                # Estimate stock level from bbox area
                 area = (x2 - x1) * (y2 - y1)
-                stock = "full" if area > 0.05 else "low" if area > 0.02 else "empty"
+                stock = "full" if area > 0.04 else "low" if area > 0.015 else "empty"
                 stock_counts[stock] += 1
 
-                # Uses generic classification pending secondary CLIP/Resnet integration
-                sku_val = "SKU-PENDING"
-                name_val = "Product"
-
-                detected.append(DetectedProduct(
-                    sku=sku_val,
-                    name=name_val,
-                    confidence=conf,
-                    bbox=[x1, y1, x2, y2],
-                    stock_level=stock,
-                    facings=max(1, int(area * 20)),
-                    position_x=round((x1 + x2) / 2, 3),
-                    position_y=round((y1 + y2) / 2, 3)
-                ))
+                detected.append({
+                    "sku": sku_val,
+                    "name": name_val,
+                    "price": price_val,
+                    "confidence": conf,
+                    "bbox": [round(x1, 4), round(y1, 4), round(x2, 4), round(y2, 4)],
+                    "stock_level": stock,
+                    "position_x": round(cx, 3),
+                    "position_y": round(cy, 3)
+                })
 
         total = max(len(detected), 1)
-        # Calculate health score safely
         health_score = ((stock_counts["full"] + stock_counts["low"] * 0.5) / total) * 100
 
         result = ShelfAnalysisResult(
@@ -129,12 +137,10 @@ class ShelfDetector:
             detected_products=detected,
             stock_summary=stock_counts,
             health_score=round(health_score, 1),
-            compliance_score=85.0,  # Placeholder until planogram engine runs
+            compliance_score=85.0, # Placeholder
             violations=[],
-            processing_time_ms=0
+            processing_time_ms=(time.time() - start_time) * 1000
         )
-
-        result.processing_time_ms = (time.time() - start_time) * 1000
         return result
 
 

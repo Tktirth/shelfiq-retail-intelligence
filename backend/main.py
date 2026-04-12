@@ -273,35 +273,60 @@ async def analyze_shelf_image(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
-    """Upload shelf image for async CV analysis via Celery."""
+    """Upload shelf image for real-time CV analysis and product identification."""
     shelf = db.query(Shelf).filter(Shelf.id == shelf_id).first()
     if not shelf:
         raise HTTPException(status_code=404, detail="Shelf not found")
         
-    planogram_model = db.query(Planogram).filter(Planogram.id == shelf.planogram_id).first()
-    planogram = planogram_model.spec if planogram_model else {}
+    # Preparation: Get planogram items for matching
+    planogram_items = []
+    if shelf.planogram_id:
+        items = db.query(PlanogramItem).filter(PlanogramItem.planogram_id == shelf.planogram_id).all()
+        for item in items:
+            prod = db.query(Product).filter(Product.id == item.product_id).first()
+            if prod:
+                planogram_items.append({
+                    "sku": prod.sku,
+                    "name": prod.name,
+                    "price": prod.unit_price,
+                    "x": item.position_x,
+                    "y": item.position_y
+                })
 
     import base64
-    image_bytes_b64 = None
+    image_bytes = None
     if file:
         image_bytes = await file.read()
-        image_bytes_b64 = base64.b64encode(image_bytes).decode('utf-8')
+    
+    from cv_engine.detector import get_detector
+    detector = get_detector()
+    
+    try:
+        # Run real inference
+        analysis = detector.analyze_shelf(
+            shelf_id=shelf_id,
+            image_bytes=image_bytes,
+            planogram_items=planogram_items
+        )
         
-    from tasks.cv_tasks import analyze_shelf_image_task
-    # Dispatch to Celery queue
-    task = analyze_shelf_image_task.delay(
-        shelf_id=shelf_id,
-        image_bytes_b64=image_bytes_b64,
-        planogram=planogram
-    )
+        # Log analysis in DB if desired (optional)
+        shelf.health_score = analysis.health_score
+        shelf.last_analyzed = datetime.utcnow()
+        db.commit()
 
-    return {
-        "status": "processing",
-        "message": "Image sent for CV analysis in background",
-        "task_id": task.id,
-        "shelf_id": shelf_id,
-        "shelf_name": shelf.name
-    }
+        return {
+            "status": "success",
+            "shelf_id": shelf_id,
+            "shelf_name": shelf.name,
+            "health_score": analysis.health_score,
+            "stock_summary": analysis.stock_summary,
+            "detected_products_count": len(analysis.detected_products),
+            "detected_products": analysis.detected_products,
+            "processing_time_ms": analysis.processing_time_ms
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"CV Analysis failed: {str(e)}")
 
 
 # ---------------------------------------------------------------------------

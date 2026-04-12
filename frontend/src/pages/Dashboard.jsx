@@ -17,12 +17,27 @@ const TICKER_MSGS = [
   '🎯 Revenue recovered today: ₹24,500  |  ',
 ]
 
+import OraclePanel from '../components/OraclePanel'
+
 export default function Dashboard() {
   const navigate = useNavigate()
   const { alerts, liveAlerts, acknowledge, totalActive } = useAlerts()
   const [kpis, setKpis] = useState(null)
   const [shelves, setShelves] = useState([])
   const [loading, setLoading] = useState(true)
+  const [oracleOpen, setOracleOpen] = useState(false)
+  const [roiFlash, setRoiFlash] = useState(false)
+  const [prevAlertCount, setPrevAlertCount] = useState(0)
+
+  // Trigger ROI Pulse when alerts are resolved
+  useEffect(() => {
+    if (totalActive < prevAlertCount) {
+      setRoiFlash(true)
+      const t = setTimeout(() => setRoiFlash(false), 2000)
+      return () => clearTimeout(t)
+    }
+    setPrevAlertCount(totalActive)
+  }, [totalActive])
 
   // Fallback data generators for when backend is down
   const generateFallbackKPIs = () => ({
@@ -67,19 +82,15 @@ export default function Dashboard() {
           setShelves(shelvesData)
         })
         .catch(() => {
-          // Backend unreachable — use client-side generated data with incremental revenue
           setKpis(prev => {
             if (!prev) return generateFallbackKPIs();
-            
-            // Add a small incremental amount to emphasize "live" growth
             const revenueIncrement = Math.floor(Math.random() * 150) + 50; 
             const newStockouts = Math.random() > 0.8 ? 1 : 0;
-            
             return { 
               ...prev,
               revenue_recovered_today: prev.revenue_recovered_today + revenueIncrement,
               stockouts_prevented: prev.stockouts_prevented + newStockouts,
-              active_alerts: totalActive, // Sync with actual hook state
+              active_alerts: totalActive, 
               alerts_this_hour: Math.max(prev.alerts_this_hour, Math.floor(Math.random() * 4))
             };
           });
@@ -90,20 +101,25 @@ export default function Dashboard() {
     
     fetchData();
     intervalId = setInterval(fetchData, 5000);
-    
     return () => clearInterval(intervalId);
-  }, [])
+  }, [totalActive])
 
   const recentAlerts = [...liveAlerts, ...alerts].slice(0, 5)
   const tickerText = TICKER_MSGS.join('  •  ')
-
   const formatCurrency = (v) => `₹${Number(v).toLocaleString()}`
 
   return (
-    <div>
-      <Topbar title="Dashboard" subtitle="Real-time shelf intelligence overview">
-        <button className="topbar-btn topbar-btn-ghost" onClick={() => window.location.reload()}>
-          🔄 Refresh
+    <>
+      <OraclePanel 
+        isOpen={oracleOpen} 
+        onClose={() => setOracleOpen(false)} 
+        kpis={kpis} 
+        alerts={[...liveAlerts, ...alerts]} 
+      />
+      
+      <Topbar title="Dashboard" subtitle="Neural Store Intelligence Hub">
+        <button className="topbar-btn topbar-btn-ghost" onClick={() => setOracleOpen(true)} style={{ color: 'var(--accent-amber)', borderColor: 'rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
+          ✨ Ask Oracle
         </button>
         <button className="topbar-btn topbar-btn-primary" onClick={() => navigate('/shelves')}>
           📷 Analyze Shelf
@@ -121,7 +137,7 @@ export default function Dashboard() {
 
         {/* KPI Cards */}
         <div className="kpi-grid">
-          <div className="kpi-card" style={{ '--accent-color': 'var(--accent-emerald)' }}>
+          <div className={`kpi-card ${roiFlash ? 'animate-roi-pulse' : ''}`} style={{ '--accent-color': 'var(--accent-emerald)' }}>
             <span className="kpi-icon">💰</span>
             <div className="kpi-value">{kpis ? formatCurrency(kpis.revenue_recovered_today) : '—'}</div>
             <div className="kpi-label">Revenue Recovered Today</div>
