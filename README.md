@@ -1,16 +1,16 @@
-# 🛒 ShelfIQ — Smart Retail Shelf Intelligence
+# 🛒 ShelfIQ — Neural Hub • Active Intelligence v4.2
 
-> **See every shelf. Miss nothing.** — AI-powered retail monitoring with computer vision, demand forecasting & real-time alerts.
+> **Infinite Vision. Zero Blindspots.** — Enterprise-grade retail monitoring with Prescriptive AI, Computer Vision, and Digital Twin ROI Mapping.
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Vercel-black?style=for-the-badge)](https://shelfiq-retail-intelligence.vercel.app)
-[![Backend API](https://img.shields.io/badge/🔌_Backend_API-Render-46E3B7?style=for-the-badge)](https://shelfiq-api.onrender.com/docs)
+[![Backend API](https://img.shields.io/badge/🔌_Backend_API-Render-46E3B7?style=for-the-badge)](https://shelfiq-retail-intelligence.onrender.com/docs)
 [![GitHub](https://img.shields.io/badge/⭐_GitHub-Tktirth-181717?style=for-the-badge&logo=github)](https://github.com/Tktirth/shelfiq-retail-intelligence)
 
-| 🌐 Frontend | 🔌 Backend API | 📚 Swagger Docs |
+| 🌐 Neural Hub (Frontend) | 🔌 Core Intelligence (API) | 📚 Schema Docs |
 |---|---|---|
-| [shelfiq-retail-intelligence.vercel.app](https://shelfiq-retail-intelligence.vercel.app) | [shelfiq-api.onrender.com](https://shelfiq-api.onrender.com) | [shelfiq-api.onrender.com/docs](https://shelfiq-api.onrender.com/docs) |
+| [shelfiq-intelligence.app](https://shelfiq-retail-intelligence.vercel.app) | [api.shelfiq.onrender.com](https://shelfiq-retail-intelligence.onrender.com) | [api.shelfiq/docs](https://shelfiq-retail-intelligence.onrender.com/docs) |
 
-> **Note:** Backend runs on Render Free tier — first request after inactivity may take ~30s to spin up.
+> **IMPORTANT:** This is the **Neural Oracle Edition**. It features prescriptive analytics that go beyond simple detection to identify revenue recovery strategies in real-time.
 
 ---
 
@@ -58,14 +58,32 @@ Open **http://localhost:5173** and login using default seeded credentials:
 
 ---
 
-## 🧠 AI Components
+## ✨ Enterprise "Wow" Features
+
+### 🧠 1. ShelfIQ Oracle (Prescriptive AI)
+Our proprietary **Prescriptive Engine** that acts as a real-time store consultant. It doesn't just show data; it generates management strategies:
+- **Revenue Recovery**: Identifies specific shelves draining profit and suggests immediate restocks.
+- **Neural Typing UI**: A high-fidelity, scanning-line interface for "Strategy Sessions."
+- **Contextual Awareness**: Real-time analysis of stockouts vs. footfall pressure.
+
+### 🕵️ 2. Digital Twin ROI Mapping
+Visualize financial loss directly on the shelf.
+- **ROI Overlays**: Hover over "Empty" or "Low" products to see precisely how much revenue is at risk (e.g., `-₹450/hr`).
+- **Visual Evidence**: Boxes detections directly overlaid on live shelf images with confidence scoring.
+
+### ⚡ 3. Live ROI Pulse
+A gamified dashboard experience where every resolution has a visible reward.
+- **Golden Pulse**: The Revenue KPI card glows with a gold aura when alerts are acknowledged.
+- **Neural Scan**: A global scanning-line animation providing a constant "Deep Tech" aesthetic.
+
+---
+
+## 🏗️ Architecture
 
 ### 1. Computer Vision Engine (`backend/cv_engine/detector.py`)
-- **YOLOv8** for real-time product and shelf detection
-- Detects: product presence/absence, stock levels (full/low/empty), facing counts
-- Handles: varying lighting, partial occlusions, multiple camera angles
-- **Demo Mode**: Generates realistic synthetic detections (no GPU needed)
-- **Full Mode**: Set `DEMO_MODE=false` with YOLOv8 model available
+- **YOLOv8 SKU-110K**: Optimized model for high-density retail environments.
+- **Spatial Matching**: Maps 2D bounding boxes to 3D shelf coordinates using Planogram Digital Twins.
+- **Dynamic Identification**: Automatically maps detected boxes to real product names/prices via database lookup.
 
 ### 2. SKU Recognition (`backend/cv_engine/sku_recognizer.py`)
 - **CLIP** (ViT-B/32) visual embeddings for zero-shot product recognition
@@ -210,11 +228,12 @@ retail-shelf-intelligence/
 │       ├── hooks/
 │       │   └── useAlerts.jsx      # Alert context + WebSocket hook
 │       ├── components/
-│       │   ├── Sidebar.jsx
+│       │   ├── Sidebar.jsx        # Neural Prism Branding
+│       │   ├── OraclePanel.jsx    # Prescriptive AI Consultant
 │       │   ├── Topbar.jsx
-│       │   ├── MetricGauge.jsx    # SVG radial gauge
+│       │   ├── MetricGauge.jsx
 │       │   ├── AlertCard.jsx
-│       │   └── ShelfMap.jsx       # SVG floor plan
+│       │   └── ShelfMap.jsx
 │       └── pages/
 │           ├── Dashboard.jsx
 │           ├── ShelvesPage.jsx
