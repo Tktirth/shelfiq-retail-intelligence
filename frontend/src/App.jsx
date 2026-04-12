@@ -27,7 +27,6 @@ const AppContent = () => {
 
   return (
     <>
-      {user && <div className="neural-scan-line" />}
       {user && <Sidebar />}
       <div className={user ? "main-content" : "w-full"}>
         <Routes>

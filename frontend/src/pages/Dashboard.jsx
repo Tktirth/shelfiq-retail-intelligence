@@ -17,15 +17,12 @@ const TICKER_MSGS = [
   '🎯 Revenue recovered today: ₹24,500  |  ',
 ]
 
-import OraclePanel from '../components/OraclePanel'
-
 export default function Dashboard() {
   const navigate = useNavigate()
   const { alerts, liveAlerts, acknowledge, totalActive } = useAlerts()
   const [kpis, setKpis] = useState(null)
   const [shelves, setShelves] = useState([])
   const [loading, setLoading] = useState(true)
-  const [oracleOpen, setOracleOpen] = useState(false)
   const [roiFlash, setRoiFlash] = useState(false)
   const [prevAlertCount, setPrevAlertCount] = useState(0)
 
@@ -110,17 +107,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <OraclePanel 
-        isOpen={oracleOpen} 
-        onClose={() => setOracleOpen(false)} 
-        kpis={kpis} 
-        alerts={[...liveAlerts, ...alerts]} 
-      />
-      
       <Topbar title="Dashboard" subtitle="Neural Store Intelligence Hub">
-        <button className="topbar-btn topbar-btn-ghost" onClick={() => setOracleOpen(true)} style={{ color: 'var(--accent-amber)', borderColor: 'rgba(245, 158, 11, 0.3)', background: 'rgba(245, 158, 11, 0.05)' }}>
-          ✨ Ask Oracle
-        </button>
         <button className="topbar-btn topbar-btn-primary" onClick={() => navigate('/shelves')}>
           📷 Analyze Shelf
         </button>

@@ -1,6 +1,6 @@
 # 🛒 ShelfIQ — Neural Hub • Active Intelligence v4.2
 
-> **Infinite Vision. Zero Blindspots.** — Enterprise-grade retail monitoring with Prescriptive AI, Computer Vision, and Digital Twin ROI Mapping.
+> **Infinite Vision. Zero Blindspots.** — Enterprise-grade retail monitoring with Computer Vision and Digital Twin ROI Mapping.
 
 [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Vercel-black?style=for-the-badge)](https://shelfiq-retail-intelligence.vercel.app)
 [![Backend API](https://img.shields.io/badge/🔌_Backend_API-Render-46E3B7?style=for-the-badge)](https://shelfiq-retail-intelligence.onrender.com/docs)
@@ -10,7 +10,7 @@
 |---|---|---|
 | [shelfiq-intelligence.app](https://shelfiq-retail-intelligence.vercel.app) | [api.shelfiq.onrender.com](https://shelfiq-retail-intelligence.onrender.com) | [api.shelfiq/docs](https://shelfiq-retail-intelligence.onrender.com/docs) |
 
-> **IMPORTANT:** This is the **Neural Oracle Edition**. It features prescriptive analytics that go beyond simple detection to identify revenue recovery strategies in real-time.
+> **Note:** Backend runs on Render Free tier — first request after inactivity may take ~30s to spin up.
 
 ---
 
@@ -60,21 +60,14 @@ Open **http://localhost:5173** and login using default seeded credentials:
 
 ## ✨ Enterprise "Wow" Features
 
-### 🧠 1. ShelfIQ Oracle (Prescriptive AI)
-Our proprietary **Prescriptive Engine** that acts as a real-time store consultant. It doesn't just show data; it generates management strategies:
-- **Revenue Recovery**: Identifies specific shelves draining profit and suggests immediate restocks.
-- **Neural Typing UI**: A high-fidelity, scanning-line interface for "Strategy Sessions."
-- **Contextual Awareness**: Real-time analysis of stockouts vs. footfall pressure.
-
-### 🕵️ 2. Digital Twin ROI Mapping
+### 🕵️ 1. Digital Twin ROI Mapping
 Visualize financial loss directly on the shelf.
 - **ROI Overlays**: Hover over "Empty" or "Low" products to see precisely how much revenue is at risk (e.g., `-₹450/hr`).
 - **Visual Evidence**: Boxes detections directly overlaid on live shelf images with confidence scoring.
 
-### ⚡ 3. Live ROI Pulse
+### ⚡ 2. Live ROI Pulse
 A gamified dashboard experience where every resolution has a visible reward.
 - **Golden Pulse**: The Revenue KPI card glows with a gold aura when alerts are acknowledged.
-- **Neural Scan**: A global scanning-line animation providing a constant "Deep Tech" aesthetic.
 
 ---
 
@@ -229,7 +222,6 @@ retail-shelf-intelligence/
 │       │   └── useAlerts.jsx      # Alert context + WebSocket hook
 │       ├── components/
 │       │   ├── Sidebar.jsx        # Neural Prism Branding
-│       │   ├── OraclePanel.jsx    # Prescriptive AI Consultant
 │       │   ├── Topbar.jsx
 │       │   ├── MetricGauge.jsx
 │       │   ├── AlertCard.jsx
